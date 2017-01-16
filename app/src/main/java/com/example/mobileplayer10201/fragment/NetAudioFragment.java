@@ -117,8 +117,8 @@ public class NetAudioFragment extends BaseFragment {
             }
         });
     }
-    private void processData(String saveJson) {
-        NetAudioBean netAudioBean = (NetAudioBean) parsedJson(saveJson);
+    private void processData(String json) {
+        NetAudioBean netAudioBean = paraseJons(json);
         LogUtil.e(netAudioBean.getList().get(0).getText()+"-----------");
 
         datas = netAudioBean.getList();
@@ -139,13 +139,12 @@ public class NetAudioFragment extends BaseFragment {
     }
 
     /**
-     * 使用Gson解析json数据
+     * json解析数据
      * @param json
      * @return
      */
-    private List<NetAudioBean.ListBean> parsedJson(String json) {
-        NetAudioBean netAudioBean = new Gson().fromJson(json,NetAudioBean.class);
-        return netAudioBean.getList();
+    private NetAudioBean paraseJons(String json) {
+        return new Gson().fromJson(json,NetAudioBean.class);
     }
 
     @Override

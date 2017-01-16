@@ -3,6 +3,8 @@ package com.example.mobileplayer10201;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +23,8 @@ import com.example.mobileplayer10201.fragment.NetVideoFragment;
 import com.example.mobileplayer10201.fragment.RecyclerViewFragment;
 
 import java.util.ArrayList;
+
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
 
 public class MainActivity extends AppCompatActivity {
     private RadioGroup rg_main;
@@ -44,6 +48,30 @@ public class MainActivity extends AppCompatActivity {
         initFragment();
         //设置RadioGroup的监听
         initListenter();
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorEventListener = new JCVideoPlayer.JCAutoFullscreenListener();
+    }
+    SensorManager sensorManager;
+    JCVideoPlayer.JCAutoFullscreenListener sensorEventListener;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Sensor accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(sensorEventListener, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(sensorEventListener);
+        JCVideoPlayer.releaseAllVideos();
+    }
+    @Override
+    public void onBackPressed() {
+        if (JCVideoPlayer.backPress()) {
+            return;
+        }
+        super.onBackPressed();
     }
     private void initListenter() {
         //设置RadioGroup选中状态变化的监听
@@ -90,7 +118,16 @@ public class MainActivity extends AppCompatActivity {
         fragments.add(new NetVideoFragment());
         fragments.add(new RecyclerViewFragment());
 
+        defultFragemtn(fragments.get(position));
+
     }
+    //设置默认的Fragemnt
+    private void defultFragemtn(Fragment to) {
+        tempFragment = to;
+        getSupportFragmentManager().beginTransaction().add(R.id.fl_mainc_content, to).commit();
+    }
+
+
     private void switchFragment(Fragment currentFragment) {
         if(tempFragment != currentFragment){
             //开启事务
@@ -118,6 +155,18 @@ public class MainActivity extends AppCompatActivity {
             }
             tempFragment = currentFragment;
         }
+    }
+    /**
+     * 根据位置获取对应位置的Fragment
+     *
+     * @param position
+     * @return
+     */
+    private Fragment getFragment(int position) {
+        if (fragments != null && fragments.size() > 0) {
+            return fragments.get(position);
+        }
+        return null;
     }
 
     @Override
