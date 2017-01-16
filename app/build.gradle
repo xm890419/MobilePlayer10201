@@ -32,5 +32,5 @@ dependencies {
     compile 'fm.jiecao:jiecaovideoplayer:4.8.3'
     compile files('libs/glide-3.7.0.jar')
     compile project(':PhotoView_library')
-
+    compile project(':library')
 }

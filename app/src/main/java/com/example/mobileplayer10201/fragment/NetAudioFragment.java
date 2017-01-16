@@ -7,7 +7,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.cjj.MaterialRefreshLayout;
+import com.cjj.MaterialRefreshListener;
 import com.example.mobileplayer10201.NetAudioBean;
 import com.example.mobileplayer10201.R;
 import com.example.mobileplayer10201.ShowImageAndGifActivity;
@@ -42,6 +45,8 @@ public class NetAudioFragment extends BaseFragment {
     ProgressBar progressbar;
     @Bind(R.id.tv_nomedia)
     TextView tvNomedia;
+    @Bind(R.id.refresh)
+    MaterialRefreshLayout refreshLayout;
     private NetAudioFragmentAdapter myAdapter;
     private List<NetAudioBean.ListBean> datas;
     @Override
@@ -73,9 +78,25 @@ public class NetAudioFragment extends BaseFragment {
 
             }
         });
+        //监听下拉和上拉刷新
+        refreshLayout.setMaterialRefreshListener(new MyMaterialRefreshListener());
 
         return view;
     }
+    class MyMaterialRefreshListener extends MaterialRefreshListener {
+
+        @Override
+        public void onRefresh(MaterialRefreshLayout materialRefreshLayout) {
+            //Toast.makeText(mContext, "下拉刷新", Toast.LENGTH_SHORT).show();
+                    getDataFromNet();
+            }
+
+        @Override
+        public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout) {
+            super.onRefreshLoadMore(materialRefreshLayout);
+            Toast.makeText(mContext, "加载更多", Toast.LENGTH_SHORT).show();
+            }
+        }
 
     @Override
     public void initData() {
@@ -99,6 +120,7 @@ public class NetAudioFragment extends BaseFragment {
                 CacheUtils.putString(mContext, Constants.NET_AUDIO_URL, result);
                 LogUtil.e("onSuccess==" + result);
                 processData(result);
+                refreshLayout.finishRefresh();
             }
 
             @Override
