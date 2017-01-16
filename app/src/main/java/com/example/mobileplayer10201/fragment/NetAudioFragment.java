@@ -1,5 +1,6 @@
 package com.example.mobileplayer10201.fragment;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -7,6 +8,7 @@ import android.widget.TextView;
 
 import com.example.mobileplayer10201.NetAudioBean;
 import com.example.mobileplayer10201.R;
+import com.example.mobileplayer10201.adapter.NetAudioFragmentAdapter;
 import com.example.mobileplayer10201.base.BaseFragment;
 import com.example.mobileplayer10201.utils.CacheUtils;
 import com.example.mobileplayer10201.utils.Constants;
@@ -37,8 +39,8 @@ public class NetAudioFragment extends BaseFragment {
     ProgressBar progressbar;
     @Bind(R.id.tv_nomedia)
     TextView tvNomedia;
-
-    private TextView textView;
+    private NetAudioFragmentAdapter myAdapter;
+    private List<NetAudioBean.ListBean> datas;
     @Override
     public View initView() {
         View view = View.inflate(mContext, R.layout.fragment_net_audio, null);
@@ -50,8 +52,14 @@ public class NetAudioFragment extends BaseFragment {
     public void initData() {
         super.initData();
         String saveJson = CacheUtils.getString(mContext, Constants.NET_AUDIO_URL);
+        if(!TextUtils.isEmpty(saveJson)){
+            processData(saveJson);
+        }
+
         getDataFromNet();
     }
+
+
 
     private void getDataFromNet() {
         RequestParams reques = new RequestParams(Constants.NET_AUDIO_URL);
@@ -61,7 +69,7 @@ public class NetAudioFragment extends BaseFragment {
 
                 CacheUtils.putString(mContext, Constants.NET_AUDIO_URL, result);
                 LogUtil.e("onSuccess==" + result);
-
+                processData(result);
             }
 
             @Override
@@ -80,6 +88,26 @@ public class NetAudioFragment extends BaseFragment {
             }
         });
     }
+    private void processData(String saveJson) {
+        NetAudioBean netAudioBean = (NetAudioBean) parsedJson(saveJson);
+        LogUtil.e(netAudioBean.getList().get(0).getText()+"-----------");
+
+        datas = netAudioBean.getList();
+
+        if(datas != null && datas.size() >0){
+            //有视频
+            tvNomedia.setVisibility(View.GONE);
+            //设置适配器
+            myAdapter = new NetAudioFragmentAdapter(mContext,datas);
+            listview.setAdapter(myAdapter);
+        }else{
+            //没有视频
+            tvNomedia.setVisibility(View.VISIBLE);
+        }
+
+        progressbar.setVisibility(View.GONE);
+
+    }
 
     /**
      * 使用Gson解析json数据
@@ -94,7 +122,7 @@ public class NetAudioFragment extends BaseFragment {
     @Override
     public void onRefreshData() {
         super.onRefreshData();
-        textView.setText("网络音频刷新");
+        //textView.setText("网络音频刷新");
     }
     @Override
     public void onDestroyView() {
