@@ -1,13 +1,16 @@
 package com.example.mobileplayer10201.fragment;
 
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.mobileplayer10201.NetAudioBean;
 import com.example.mobileplayer10201.R;
+import com.example.mobileplayer10201.ShowImageAndGifActivity;
 import com.example.mobileplayer10201.adapter.NetAudioFragmentAdapter;
 import com.example.mobileplayer10201.base.BaseFragment;
 import com.example.mobileplayer10201.utils.CacheUtils;
@@ -45,6 +48,32 @@ public class NetAudioFragment extends BaseFragment {
     public View initView() {
         View view = View.inflate(mContext, R.layout.fragment_net_audio, null);
         ButterKnife.bind(this, view);
+        //设置点击事件
+        //设置点击事件
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                NetAudioBean.ListBean listEntity = datas.get(position);
+                if(listEntity !=null ){
+                    //3.传递视频列表
+                    Intent intent = new Intent(mContext,ShowImageAndGifActivity.class);
+                    if(listEntity.getType().equals("gif")){
+                        String url = listEntity.getGif().getImages().get(0);
+                        intent.putExtra("url",url);
+                        mContext.startActivity(intent);
+                    }else if(listEntity.getType().equals("image")){
+                        String url = listEntity.getImage().getBig().get(0);
+                        intent.putExtra("url",url);
+                        mContext.startActivity(intent);
+                    }
+                }
+
+
+            }
+        });
+
         return view;
     }
 

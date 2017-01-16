@@ -30,4 +30,6 @@ dependencies {
     compile project(':xutils')
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'fm.jiecao:jiecaovideoplayer:4.8.3'
+    compile files('libs/glide-3.7.0.jar')
+    compile project(':PhotoView_library')
 }
